@@ -11,9 +11,33 @@
                               (clojure-version)
                               (route/url-for ::about-page))))
 
+(def mock-project-collection
+  {:sleeping-cat {:name "Sleeping Cat Project"
+                  :framework "Pedestal"
+                  :language "Clojure"
+                  :repo "https://gitlab.com/srehorn/sleepingcat"}
+   :stinky-dog {:name "Stinky Dog Experiment"
+                :framework "Grails"
+                :language "Groovy"
+                :repo "https://gitlab.com/srehorn/stinkydog"}})
+
+(defn add-project
+  [request]
+  (prn (:json-params request))
+  (ring-resp/created "http://fake-201-url" "fake 201 in the body"))
+
 (defn home-page
   [request]
   (ring-resp/response "Hello from Heroku!"))
+
+(defn get-project
+  [request]
+  (let [projname (get-in request [:path-params :project-name])]
+    (bootstrap/json-response ((keyword projname) mock-project-collection))))
+
+(defn get-projects
+  [request]
+  (bootstrap/json-response mock-project-collection))
 
 (defroutes routes
   ;; Defines "/" and "/about" routes with their associated :get handlers.
@@ -21,6 +45,9 @@
   ;; apply to / and its children (/about).
   [[["/" {:get home-page}
      ^:interceptors [(body-params/body-params) bootstrap/html-body]
+     ["/projects" {:get get-projects
+                   :post add-project}]
+     ["/projects/:project-name" {:get get-project}]
      ["/about" {:get about-page}]]]])
 
 ;; Consumed by hidden-reef-3079.server/create-server
