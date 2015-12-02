@@ -3,6 +3,9 @@
             [io.pedestal.http.route :as route]
             [io.pedestal.http.body-params :as body-params]
             [io.pedestal.http.route.definition :refer [defroutes]]
+            [monger.core :as mg]
+            [monger.collection :as mc]
+            [monger.json]
             [ring.util.response :as ring-resp]))
 
 (defn about-page
@@ -37,7 +40,10 @@
 
 (defn get-projects
   [request]
-  (bootstrap/json-response mock-project-collection))
+  (let [uri (System/getenv "MONGO_CONNECTION")
+        {:keys [conn db]} (mg/connect-via-uri uri)]
+    (bootstrap/json-response
+     (mc/find-maps db "project-catalog"))))
 
 (defroutes routes
   ;; Defines "/" and "/about" routes with their associated :get handlers.

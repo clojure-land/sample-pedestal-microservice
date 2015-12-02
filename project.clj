@@ -12,6 +12,9 @@
                  ;; [io.pedestal/pedestal.immutant "0.4.0"]
                  ;; [io.pedestal/pedestal.tomcat "0.4.0"]
 
+                 ;; mongodb
+                 [com.novemberain/monger "3.0.0-rc2"]
+
                  [ch.qos.logback/logback-classic "1.1.2" :exclusions [org.slf4j/slf4j-api]]
                  [org.slf4j/jul-to-slf4j "1.7.7"]
                  [org.slf4j/jcl-over-slf4j "1.7.7"]
