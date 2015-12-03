@@ -26,17 +26,26 @@
 
 (defn add-project
   [request]
-  (prn (:json-params request))
-  (ring-resp/created "http://fake-201-url" "fake 201 in the body"))
+  (let [incoming (:json-params request)
+        connect-string (System/getenv "MONGO_CONNECTION")
+        {:keys [conn db]} (mg/connect-via-uri connect-string)]
+    (ring-resp/created
+     "http://my-created-resource-url"
+     (mc/insert-and-return db "project-catalog" incoming))))
 
 (defn home-page
   [request]
   (ring-resp/response "Hello from Heroku!"))
 
+(defn db-get-project [proj-name]
+  (let [uri (System/getenv "MONGO_CONNECTION")
+        {:keys [conn db]} (mg/connect-via-uri uri)]
+    (mc/find-maps db "project-catalog" {:proj-name proj-name})))
+
 (defn get-project
   [request]
-  (let [projname (get-in request [:path-params :project-name])]
-    (bootstrap/json-response ((keyword projname) mock-project-collection))))
+  (bootstrap/json-response (db-get-project
+                            (get-in request [:path-params :proj-name]))))
 
 (defn get-projects
   [request]
@@ -53,7 +62,7 @@
      ^:interceptors [(body-params/body-params) bootstrap/html-body]
      ["/projects" {:get get-projects
                    :post add-project}]
-     ["/projects/:project-name" {:get get-project}]
+     ["/projects/:proj-name" {:get get-project}]
      ["/about" {:get about-page}]]]])
 
 ;; Consumed by hidden-reef-3079.server/create-server
