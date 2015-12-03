@@ -12,6 +12,9 @@
                  ;; [io.pedestal/pedestal.immutant "0.4.0"]
                  ;; [io.pedestal/pedestal.tomcat "0.4.0"]
 
+                 ;; http client
+                 [clj-http "2.0.0"]
+
                  ;; mongodb
                  [com.novemberain/monger "3.0.0-rc2"]
 

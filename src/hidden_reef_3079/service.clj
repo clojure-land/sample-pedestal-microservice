@@ -4,9 +4,11 @@
             [io.pedestal.http.body-params :as body-params]
             [io.pedestal.http.route.definition :refer [defroutes]]
             [io.pedestal.interceptor.helpers :refer [definterceptor defhandler]]
+            [clj-http.client :as client]
             [monger.core :as mg]
             [monger.collection :as mc]
             [monger.json]
+            [clojure.data.json :as json]
             [ring.util.response :as ring-resp]))
 
 (defn about-page
@@ -24,6 +26,18 @@
                 :framework "Grails"
                 :language "Groovy"
                 :repo "https://gitlab.com/srehorn/stinkydog"}})
+
+(defn git-search [q]
+  (let [ret (client/get
+             (format "https://api.github.com/search/repositories?q=%s+language:clojure" q)
+             {:debug false
+              :content-type :json
+              :accept :json})]
+    (json/read-str (ret :body))))
+
+(defn git-get
+  [request]
+  (bootstrap/json-response (git-search (get-in request [:query-params :q]))))
 
 (defn add-project
   [request]
@@ -70,6 +84,7 @@
                      token-check]
      ["/projects" {:get get-projects
                    :post add-project}]
+     ["/see-also" {:get git-get}]
      ["/projects/:proj-name" {:get get-project}]
      ["/about" {:get about-page}]]]])
 
