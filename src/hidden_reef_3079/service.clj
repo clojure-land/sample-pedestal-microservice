@@ -3,6 +3,7 @@
             [io.pedestal.http.route :as route]
             [io.pedestal.http.body-params :as body-params]
             [io.pedestal.http.route.definition :refer [defroutes]]
+            [io.pedestal.interceptor.helpers :refer [definterceptor defhandler]]
             [monger.core :as mg]
             [monger.collection :as mc]
             [monger.json]
@@ -54,12 +55,19 @@
     (bootstrap/json-response
      (mc/find-maps db "project-catalog"))))
 
+(defhandler token-check [request]
+  (let [token (get-in request [:headers "x-catalog-token"])]
+    (if (not (= token "o brave new world"))
+      (assoc (ring-resp/response {:body "access denied"}) :status 403))))
+
 (defroutes routes
   ;; Defines "/" and "/about" routes with their associated :get handlers.
   ;; The interceptors defined after the verb map (e.g., {:get home-page}
   ;; apply to / and its children (/about).
   [[["/" {:get home-page}
-     ^:interceptors [(body-params/body-params) bootstrap/html-body]
+     ^:interceptors [(body-params/body-params)
+                     bootstrap/html-body
+                     token-check]
      ["/projects" {:get get-projects
                    :post add-project}]
      ["/projects/:proj-name" {:get get-project}]
