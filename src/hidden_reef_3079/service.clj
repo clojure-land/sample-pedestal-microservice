@@ -5,11 +5,59 @@
             [io.pedestal.http.route.definition :refer [defroutes]]
             [io.pedestal.interceptor.helpers :refer [definterceptor defhandler]]
             [clj-http.client :as client]
+            [clojure.data.xml :as xml]
             [monger.core :as mg]
             [monger.collection :as mc]
             [monger.json]
             [clojure.data.json :as json]
             [ring.util.response :as ring-resp]))
+
+(def raw-proj-string
+  "<project>
+      <proj-name>olingquit</proj-name>
+      <name>The Important Olingquit Project</name>
+      <framework>Rails</framework>
+      <language>Ruby</language>
+      <repo>https://gitlab.com/srehorn/olingquit</repo>
+   </project>")
+
+(def proj-xml (xml/parse-str raw-proj-string))
+
+(defn get-by-tag [proj-map-in tname]
+  (->> proj-map-in
+       :content
+       (filter #(= (:tag %) tname))
+       first
+       :content
+       first))
+
+(defn monger-mapper [xmlstring]
+  "take a raw xml string, and map a known structure into a simple map"
+  (let [proj-xml (xml/parse-str xmlstring)]
+    {:proj-name (get-by-tag proj-xml :proj-name)
+     :name (get-by-tag proj-xml :name)
+     :framework (get-by-tag proj-xml :framework)
+     :language (get-by-tag proj-xml :language)
+     :repo (get-by-tag proj-xml :repo)}))
+
+(defn xml-out [known-map]
+  (xml/element :project {}
+               (xml/element :_id {} (.toString (:_id known-map)))
+               (xml/element :proj-name {} (.toString (:proj-name known-map)))
+               (xml/element :name {} (.toString (:name known-map)))
+               (xml/element :framework {} (.toString (:framework known-map)))
+               (xml/element :repo {} (.toString (:repo known-map)))
+               (xml/element :language {} (.toString (:language known-map)))))
+
+(defn add-project-xml
+  [request]
+  (let [incoming (slurp (:body request))
+        uri (System/getenv "MONGO_CONNECTION")
+        {:keys [conn db]} (mg/connect-via-uri uri)
+        ok (mc/insert-and-return db "project-catalog" (monger-mapper incoming))]
+    (-> (ring-resp/created "http://my-created-resource-url"
+                           (xml/emit-str (xml-out ok)))
+        (ring-resp/content-type "application/xml"))))
 
 (defn auth0-token []
   (let [ret (client/post "https://ghiden.au.auth0.com/oauth/token"
@@ -94,6 +142,7 @@
                      token-check]
      ["/projects" {:get get-projects
                    :post add-project}]
+     ["/projects-xml" {:post add-project-xml}]
      ["/see-also" {:get git-get}]
      ["/projects/:proj-name" {:get get-project}]
      ["/about" {:get about-page}]]]])

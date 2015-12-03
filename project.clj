@@ -15,6 +15,9 @@
                  ;; http client
                  [clj-http "2.0.0"]
 
+                 ;; xml
+                 [org.clojure/data.xml "0.0.8"]
+
                  ;; mongodb
                  [com.novemberain/monger "3.0.0-rc2"]
 
