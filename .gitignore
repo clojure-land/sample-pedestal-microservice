@@ -3,3 +3,4 @@ tmp/
 logs/
 .nrepl-port
 .DS_Store
+.lein-repl-history
