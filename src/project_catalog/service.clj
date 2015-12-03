@@ -1,4 +1,4 @@
-(ns hidden-reef-3079.service
+(ns project-catalog.service
   (:require [io.pedestal.http :as bootstrap]
             [io.pedestal.http.route :as route]
             [io.pedestal.http.body-params :as body-params]
@@ -9,7 +9,7 @@
             [monger.core :as mg]
             [monger.collection :as mc]
             [monger.json]
-            [hidden-reef-3079.dbhelpers :as db]
+            [project-catalog.dbhelpers :as db]
             [clojure.data.json :as json]
             [ring.util.response :as ring-resp]))
 
@@ -143,7 +143,7 @@
      ["/projects/:proj-name" {:get get-project}]
      ["/about" {:get about-page}]]]])
 
-;; Consumed by hidden-reef-3079.server/create-server
+;; Consumed by project-catalog.server/create-server
 ;; See bootstrap/default-interceptors for additional options you can configure
 (def service {:env :prod
               ;; You can bring your own non-default interceptors. Make

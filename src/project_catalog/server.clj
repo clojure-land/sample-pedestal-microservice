@@ -1,7 +1,7 @@
-(ns hidden-reef-3079.server
+(ns project-catalog.server
   (:gen-class) ; for -main method in uberjar
   (:require [io.pedestal.http :as server]
-            [hidden-reef-3079.service :as service]))
+            [project-catalog.service :as service]))
 
 ;; This is an adapted service map, that can be started and stopped
 ;; From the REPL you can call server/start and server/stop on this service

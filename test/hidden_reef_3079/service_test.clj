@@ -1,8 +1,8 @@
-(ns hidden-reef-3079.service-test
+(ns project-catalog.service-test
   (:require [clojure.test :refer :all]
             [io.pedestal.test :refer :all]
             [io.pedestal.http :as bootstrap]
-            [hidden-reef-3079.service :as service]))
+            [project-catalog.service :as service]))
 
 (def service
   (::bootstrap/service-fn (bootstrap/create-servlet service/service)))

@@ -1,4 +1,4 @@
-(defproject hidden-reef-3079 "0.0.1-SNAPSHOT"
+(defproject project-catalog "0.0.1-SNAPSHOT"
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
@@ -30,8 +30,8 @@
                  [org.slf4j/log4j-over-slf4j "1.7.7"]]
   :min-lein-version "2.0.0"
   :resource-paths ["config", "resources"]
-  :profiles {:dev {:aliases {"run-dev" ["trampoline" "run" "-m" "hidden-reef-3079.server/run-dev"]}
+  :profiles {:dev {:aliases {"run-dev" ["trampoline" "run" "-m" "project-catalog.server/run-dev"]}
                    :dependencies [[io.pedestal/pedestal.service-tools "0.4.0"]]}
-             :uberjar {:aot [hidden-reef-3079.server]}}
-  :main ^{:skip-aot true} hidden-reef-3079.server)
+             :uberjar {:aot [project-catalog.server]}}
+  :main ^{:skip-aot true} project-catalog.server)
 

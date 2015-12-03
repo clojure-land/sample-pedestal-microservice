@@ -1,4 +1,4 @@
-(ns hidden-reef-3079.dbhelpers
+(ns project-catalog.dbhelpers
   (:require [monger.core :as mg]
             [monger.collection :as mc]
             [monger.json]))
