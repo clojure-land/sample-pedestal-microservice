@@ -9,6 +9,7 @@
             [monger.core :as mg]
             [monger.collection :as mc]
             [monger.json]
+            [hidden-reef-3079.dbhelpers :as db]
             [clojure.data.json :as json]
             [ring.util.response :as ring-resp]))
 
@@ -110,14 +111,9 @@
   [request]
   (ring-resp/response "Hello from Heroku!"))
 
-(defn db-get-project [proj-name]
-  (let [uri (System/getenv "MONGO_CONNECTION")
-        {:keys [conn db]} (mg/connect-via-uri uri)]
-    (mc/find-maps db "project-catalog" {:proj-name proj-name})))
-
 (defn get-project
   [request]
-  (bootstrap/json-response (db-get-project
+  (bootstrap/json-response (db/db-get-project
                             (get-in request [:path-params :proj-name]))))
 
 (defn get-projects
